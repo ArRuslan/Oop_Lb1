@@ -4,11 +4,13 @@ struct WagonType {
     public string Type;
     public int NumberOfSeats;
     public int Price;
+    public string[] Services;
         
-    public WagonType(string type, int numberOfSeats, int price) {
+    public WagonType(string type, int numberOfSeats, int price, string[] services) {
         Type = type;
         NumberOfSeats = numberOfSeats;
         Price = price;
+        Services = services;
     }
         
     public override string ToString() {

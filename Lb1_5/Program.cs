@@ -4,6 +4,8 @@
 а) Вивести список вагонів, відсортувавши за зменшенням кількості вільних місць.
 б) Для кожного вагона вказати кількість місць всього, кількість проданих квитків, кількість вільних місць, загальну суму виручених грошей.
 в) Визначити, чи можна звільнити найвільніший вагон, розмістивши його пасажирів за іншими вагонами цього ж типу, і зробити це у разі підтвердження.
+
+Додаткове завдання: Перелік послуг до типів вагонів. Вивести по послузі вагони, де вона є.
 */
 
 using System.Text;
@@ -11,8 +13,8 @@ using Lb1_5;
 
 class WagonController {
     private WagonType[] wagonTypes = { // Типи вагонів
-        new WagonType("Купе", 36, 1000),
-        new WagonType("Плацкарт", 54, 500),
+        new WagonType("Купе", 36, 1000, new string[]{"кондиціонер", "холодильник", "чай", "настільні ігри"}),
+        new WagonType("Плацкарт", 54, 500, new string[]{"чай", "холодильник", "кава"}),
     };
     private TrainWagon[] Wagons; // Масив вагонів
     
@@ -85,9 +87,13 @@ class WagonController {
         return total;
     }
     
-    public void printAll(bool printFree=false, bool printSeatsTotal=false, bool printMoney=false, TrainWagon[] wagons=null) {
+    public void printAll(bool printFree=false, bool printSeatsTotal=false, bool printMoney=false, TrainWagon[] wagons=null, string service=null) {
         if(wagons == null) wagons = Wagons;
         foreach (TrainWagon wagon in wagons) {
+            if(service != null) {
+                if(!GetType(wagon.Type).Services.Contains(service))
+                    continue;
+            }
             Console.Write(wagon.ToString());
             if(printSeatsTotal) {
                 Console.Write($", {GetType(wagon.Type).NumberOfSeats} місць");
@@ -187,9 +193,6 @@ class Program {
     }
 
     private static WagonController Input() {
-        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-        Console.InputEncoding = Encoding.GetEncoding("windows-1251");
-        
         int wagonsCount = InputInt("Кількість вагонів: ", "Неправильна кількість вагонів");
         WagonController wagonController = new WagonController(wagonsCount);
         Console.WriteLine("Типи вагонів:");
@@ -214,6 +217,9 @@ class Program {
     }
 
     public static void Main(string[] args) {
+        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+        Console.InputEncoding = Encoding.GetEncoding("windows-1251");
+    
         WagonController wagonController;
         if(args.Contains("--input")) {
             wagonController = Input();
@@ -221,7 +227,7 @@ class Program {
             wagonController = new WagonController(15);
             wagonController[0] = new TrainWagon(1, "Купе", 10);
             wagonController[1] = new TrainWagon(2, "Купе", 36);
-            wagonController[2] = new TrainWagon(3, "Плацкарт", 15);
+            wagonController[2] = new TrainWagon(3, "Плацкарт", 50);
             wagonController[3] = new TrainWagon(4, "Купе", 36);
             wagonController[4] = new TrainWagon(5, "Плацкарт", 53);
             wagonController[5] = new TrainWagon(6, "Купе", 22);
@@ -252,6 +258,19 @@ class Program {
             wagonController.printAll(printFree: true, printSeatsTotal: true, printMoney: true);
         } else {
             Console.WriteLine("Неможливо звільнити...");
+        }
+        
+        Console.WriteLine("(додаткове)");
+        while(true) {
+            Console.Write("  Уведіть послугу: ");
+            string serv = Console.ReadLine();
+            if(serv == null || serv.Trim() == "")
+                continue;
+            if(serv == "exit")
+                break;
+            
+            wagonController.printAll(service: serv);
+            Console.WriteLine();
         }
     }
 }
