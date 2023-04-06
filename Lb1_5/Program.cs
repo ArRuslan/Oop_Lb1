@@ -47,20 +47,45 @@ class WagonController {
         }
         return wagonTypes[0];
     }
-
-    public void SortByFreeSeats() {
-        Wagons = Wagons.OrderByDescending(s => GetType(s.Type).NumberOfSeats-s.SoldTickets).ToArray();
+    
+    private int freeSeats(TrainWagon wagon) {
+        return GetType(wagon.Type).NumberOfSeats-wagon.SoldTickets;
     }
     
-    public void printAll(bool printFree=false, bool printSeatsTotal=false, bool printMoney=false) {
+    private TrainWagon[] SortedByFreeSeatsS() {
+        TrainWagon[] wagons = (TrainWagon[])Wagons.Clone();
+        for(int i = 0; i < wagons.Length-1; i++) {
+            for(int j = 0; j < wagons.Length-i-1; j++) {
+                if(freeSeats(wagons[j])-freeSeats(wagons[j+1]) <= 0) {
+                    (wagons[j], wagons[j + 1]) = (wagons[j+1], wagons[j]);
+                }
+            }
+        }
+        return wagons;
+    }
+
+    public TrainWagon[] SortedByFreeSeats() {
+        //return SortedByFreeSeatsS();
+        return Wagons.OrderByDescending(s => freeSeats(s)).ToArray();
+    }
+    
+    private long TotalMoney() {
+        long total = 0; 
         foreach (TrainWagon wagon in Wagons) {
+            total += GetType(wagon.Type).Price * wagon.SoldTickets;
+        }
+        return total;
+    }
+    
+    public void printAll(bool printFree=false, bool printSeatsTotal=false, bool printMoney=false, TrainWagon[] wagons=null) {
+        if(wagons == null) wagons = Wagons;
+        foreach (TrainWagon wagon in wagons) {
             Console.Write(wagon.ToString());
             if(printSeatsTotal) {
                 Console.Write($", {GetType(wagon.Type).NumberOfSeats} місць");
             }
             if(printFree) {
-                int free = GetType(wagon.Type).NumberOfSeats - wagon.SoldTickets;
-                Console.Write($", {free} вільних");
+                Console.Write($", {freeSeats(wagon)} вільних");
             }
             if(printMoney) {
                 int money = GetType(wagon.Type).Price * wagon.SoldTickets;
@@ -68,6 +93,8 @@ class WagonController {
             }
             Console.WriteLine();
         }
+        if(printMoney)
+            Console.WriteLine($"Усього {TotalMoney()}грн");
     }
     
     public int mostFreeWagonIndex() { // Індекс найвільнішого вагону
@@ -75,6 +102,7 @@ class WagonController {
         int minIndex = 0;
         for(int i = 0; i < Wagons.Length; i++) {
             TrainWagon wagon = Wagons[i];
+            //if(wagon.SoldTickets < 1) continue; // Вважати пусті вагони найвільнішими?
             if(wagon.SoldTickets < min.SoldTickets) {
                 min = wagon;
                 minIndex = i;
@@ -124,38 +152,6 @@ class WagonController {
             if(Wagons[minIndex].SoldTickets <= 0)
                 return;
         }
-    }
-}
-
-struct WagonType {
-    public string Type;
-    public int NumberOfSeats;
-    public int Price;
-    
-    public WagonType(string type, int numberOfSeats, int price) {
-        Type = type;
-        NumberOfSeats = numberOfSeats;
-        Price = price;
-    }
-    
-    public override string ToString() {
-        return $"{Type}: {NumberOfSeats}м., {Price}грн";
-    }
-}
-
-struct TrainWagon {
-    public int Number;
-    public string Type;
-    public int SoldTickets;
-    
-    public TrainWagon(int number, string type, int soldTickets) {
-        Number = number;
-        Type = type;
-        SoldTickets = soldTickets;
-    }
-    
-    public override string ToString() {
-        return $"Вагон №{Number}, {Type}, {SoldTickets} продано";
     }
 }
 
@@ -214,18 +210,27 @@ class Program {
         if(args.Contains("--input")) {
             wagonController = Input();
         } else {
-            wagonController = new WagonController(5);
+            wagonController = new WagonController(15);
             wagonController[0] = new TrainWagon(1, "Купе", 10);
             wagonController[1] = new TrainWagon(2, "Купе", 36);
             wagonController[2] = new TrainWagon(3, "Плацкарт", 20);
             wagonController[3] = new TrainWagon(4, "Купе", 20);
             wagonController[4] = new TrainWagon(5, "Плацкарт", 40);
+            wagonController[5] = new TrainWagon(6, "Купе", 36);
+            wagonController[6] = new TrainWagon(7, "Купе", 36);
+            wagonController[7] = new TrainWagon(8, "Купе", 0);
+            wagonController[8] = new TrainWagon(9, "Плацкарт", 1);
+            wagonController[9] = new TrainWagon(10, "Плацкарт", 7);
+            wagonController[10] = new TrainWagon(11, "Плацкарт", 54);
+            wagonController[11] = new TrainWagon(12, "Плацкарт", 54);
+            wagonController[12] = new TrainWagon(13, "Плацкарт", 5);
+            wagonController[13] = new TrainWagon(14, "Плацкарт", 8);
+            wagonController[14] = new TrainWagon(15, "Плацкарт", 25);
         }
         
         
         Console.WriteLine("(а) Список вагонів, відсортованих за зменшенням кількості вільних місць:");
-        wagonController.SortByFreeSeats();
-        wagonController.printAll(printFree: true);
+        wagonController.printAll(printFree: true, wagons: wagonController.SortedByFreeSeats());
         Console.WriteLine();
         
         Console.WriteLine("(б) Повна інформація:");
