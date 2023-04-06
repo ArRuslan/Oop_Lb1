@@ -110,8 +110,8 @@ class WagonController {
         int minIndex = 0;
         for(int i = 0; i < Wagons.Length; i++) {
             TrainWagon wagon = Wagons[i];
-            //if(wagon.SoldTickets < 1) continue; // Вважати пусті вагони найвільнішими?
-            if(wagon.SoldTickets < min.SoldTickets) {
+            if(wagon.SoldTickets < 1) continue; // Вважати пусті вагони найвільнішими?
+            if(freeSeats(wagon) > freeSeats(min)) {
                 min = wagon;
                 minIndex = i;
             }
@@ -221,19 +221,19 @@ class Program {
             wagonController = new WagonController(15);
             wagonController[0] = new TrainWagon(1, "Купе", 10);
             wagonController[1] = new TrainWagon(2, "Купе", 36);
-            wagonController[2] = new TrainWagon(3, "Плацкарт", 20);
-            wagonController[3] = new TrainWagon(4, "Купе", 20);
-            wagonController[4] = new TrainWagon(5, "Плацкарт", 40);
-            wagonController[5] = new TrainWagon(6, "Купе", 36);
-            wagonController[6] = new TrainWagon(7, "Купе", 36);
-            wagonController[7] = new TrainWagon(8, "Купе", 0);
-            wagonController[8] = new TrainWagon(9, "Плацкарт", 1);
-            wagonController[9] = new TrainWagon(10, "Плацкарт", 7);
-            wagonController[10] = new TrainWagon(11, "Плацкарт", 54);
-            wagonController[11] = new TrainWagon(12, "Плацкарт", 54);
-            wagonController[12] = new TrainWagon(13, "Плацкарт", 5);
-            wagonController[13] = new TrainWagon(14, "Плацкарт", 8);
-            wagonController[14] = new TrainWagon(15, "Плацкарт", 25);
+            wagonController[2] = new TrainWagon(3, "Плацкарт", 15);
+            wagonController[3] = new TrainWagon(4, "Купе", 36);
+            wagonController[4] = new TrainWagon(5, "Плацкарт", 53);
+            wagonController[5] = new TrainWagon(6, "Купе", 22);
+            wagonController[6] = new TrainWagon(7, "Купе", 0);
+            wagonController[7] = new TrainWagon(8, "Купе", 36);
+            wagonController[8] = new TrainWagon(9, "Плацкарт", 0);
+            wagonController[9] = new TrainWagon(10, "Плацкарт", 10);
+            wagonController[10] = new TrainWagon(11, "Плацкарт", 36);
+            wagonController[11] = new TrainWagon(12, "Плацкарт", 20);
+            wagonController[12] = new TrainWagon(13, "Плацкарт", 20);
+            wagonController[13] = new TrainWagon(14, "Плацкарт", 40);
+            wagonController[14] = new TrainWagon(15, "Плацкарт", 54);
         }
         
         
